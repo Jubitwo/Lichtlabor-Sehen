@@ -1,0 +1,614 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Lichtlabor Sehen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: Dunkelkammer wie im Lichtlabor Optik – eine Stunde in fünf Schritten, jeder Schritt eine Arbeitsfläche */
+:root{
+  color-scheme: dark;
+  --room:#0f131b; --panel:#171d28; --panel-2:#1d2432; --line:#2b3446;
+  --ink:#ebe6da; --muted:#949daf; --lamp:#ffcf6e; --lamp-ink:#221a05; --cool:#8dbcff;
+  --ok:#86d9a0; --ok-bg:#16301f; --bad:#ff9a85; --bad-bg:#3a1c17; --amber:#f2c25c; --book:#c8553d;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+body{background:var(--room);color:var(--ink);font:16px/1.55 var(--f-body)}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 56px}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 28px;padding-block:6px 16px;border-bottom:1px solid var(--line)}
+h1{font:800 clamp(30px,5vw,46px)/1.02 var(--f-display);letter-spacing:-.015em;margin:0;text-wrap:balance}
+h1 span{color:var(--lamp)}
+.lede{color:var(--muted);max-width:60ch;margin:8px 0 0}
+details.teach{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+details.teach summary{cursor:pointer;font:600 14px var(--f-body);color:var(--cool)}
+details.teach table{border-collapse:collapse;width:100%;margin-top:10px;font-size:14px}
+details.teach td,details.teach th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+details.teach th{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+details.teach td:last-child{font-variant-numeric:tabular-nums;white-space:nowrap}
+details.teach p{margin:10px 0 0;max-width:75ch;font-size:14px}
+.tblwrap{overflow-x:auto}
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-block:18px}
+@media (max-width:820px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.step{background:var(--panel);border:1px solid var(--line);color:var(--ink);text-align:left;padding:9px 12px 11px;border-radius:10px;font:inherit;cursor:pointer;display:grid;gap:1px;min-width:0;position:relative}
+.step small{font:600 11px var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.step b{font:600 16px/1.2 var(--f-display)}
+.step[aria-selected="true"]{border-color:var(--lamp);box-shadow:inset 0 -3px 0 var(--lamp);background:var(--panel-2)}
+.step[aria-selected="true"] small{color:var(--lamp)}
+.step.done::after{content:"✓";position:absolute;top:8px;right:10px;font:700 14px var(--f-body);color:var(--ok)}
+section.phase h2{font:600 clamp(22px,3vw,30px)/1.15 var(--f-display);margin:0 0 6px;text-wrap:balance}
+.intro{color:var(--muted);max-width:70ch;margin:0 0 16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.card h3{font:600 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.next{display:flex;justify-content:flex-end;margin-top:18px}
+.btn{background:transparent;border:1px solid #3d4860;color:var(--ink);border-radius:8px;padding:9px 14px;font:600 15px var(--f-body);cursor:pointer}
+.btn:hover{border-color:var(--cool)}
+.btn.primary{background:var(--lamp);color:var(--lamp-ink);border-color:var(--lamp)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button:focus-visible,select:focus-visible,#cv2:focus-visible,#cv4:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+.score{font:600 15px var(--f-mono);color:var(--lamp);font-variant-numeric:tabular-nums}
+
+/* Schritt 1: Sortieren */
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:64px;padding:12px;border:1px dashed var(--line);border-radius:12px;margin-bottom:14px}
+.pool:empty::before{content:"Alle Karten sind einsortiert. Prüfe jetzt deine Lösung.";color:var(--muted);font-size:14px;align-self:center}
+.item{display:inline-flex;align-items:center;gap:8px;background:var(--panel-2);border:1.5px solid var(--line);color:var(--ink);border-radius:999px;padding:6px 14px 6px 8px;font:600 15px var(--f-body);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.item .ico{font-size:22px;line-height:1;width:28px;text-align:center}
+.item[aria-pressed="true"]{border-color:var(--lamp);background:#2a2412}
+.item.ok{border-color:var(--ok);background:var(--ok-bg)}
+.item.bad{border-color:var(--bad);background:var(--bad-bg)}
+.item.ghost{position:fixed;z-index:50;pointer-events:none;opacity:.9;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.bins{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.bins{grid-template-columns:minmax(0,1fr)}}
+.bin{background:var(--panel);border:1.5px solid var(--line);border-radius:12px;padding:12px;min-height:150px;display:flex;flex-direction:column;gap:8px;cursor:pointer;min-width:0}
+.bin.hot{border-color:var(--lamp)}
+.bin header b{display:block;font:600 18px/1.2 var(--f-display)}
+.bin header span{font-size:13px;color:var(--muted)}
+.bin .slot{display:flex;flex-wrap:wrap;gap:6px}
+.fb{margin-top:14px;display:grid;gap:6px}
+.fb p{margin:0;padding:8px 12px;border-radius:8px;background:var(--panel-2);border-left:3px solid var(--bad);max-width:80ch;font-size:15px}
+.fb p.good{border-left-color:var(--ok)}
+
+/* Schritt 2 und 4: Szenen */
+.scene{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+@media (max-width:920px){.scene{grid-template-columns:minmax(0,1fr)}}
+.stagebox{min-width:0}
+canvas.stage{display:block;width:100%;border-radius:12px;border:1px solid var(--line);background:#07090d;touch-action:none}
+.hint{font-size:14px;color:var(--muted);margin:8px 2px 0}
+.side{display:grid;gap:14px;min-width:0}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 12px;font:15px var(--f-body);cursor:pointer;text-align:left}
+.tog::after{content:"";flex:none;width:34px;height:20px;border-radius:10px;background:#323c50 radial-gradient(circle at 10px 10px,#8a93a5 6px,transparent 7px)}
+.tog[aria-pressed="true"]{border-color:#5a4a20}
+.tog[aria-pressed="true"]::after{background:var(--lamp) radial-gradient(circle at 24px 10px,var(--lamp-ink) 6px,transparent 7px)}
+.ctls{display:grid;gap:8px}
+.status{display:grid;gap:10px}
+.st-row{display:grid;gap:2px;padding:10px 12px;border-radius:8px;background:var(--panel-2);border-left:3px solid var(--line)}
+.st-row.yes{border-left-color:var(--ok)} .st-row.no{border-left-color:var(--bad)}
+.st-row b{font:600 15px var(--f-body)}
+.st-row b em{font-style:normal;font-family:var(--f-mono);margin-left:6px}
+.st-row.yes b em{color:var(--ok)} .st-row.no b em{color:var(--bad)}
+.st-row span{font-size:14px;color:var(--muted)}
+.quests{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.quests li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:8px;font-size:15px}
+.quests li i{width:20px;height:20px;border-radius:5px;border:1.5px solid #4a5670;margin-top:2px;display:grid;place-items:center;font:normal 700 13px var(--f-body);color:var(--room)}
+.quests li.hit i{background:var(--ok);border-color:var(--ok)}
+.quests li.hit i::before{content:"✓"}
+.quiz{display:grid;gap:8px;margin-top:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--panel-2);border:1.5px solid var(--line);color:var(--ink);border-radius:8px;padding:10px 12px;font:15px/1.4 var(--f-body);cursor:pointer}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)} .opt.bad{border-color:var(--bad);background:var(--bad-bg)}
+.quiz-fb{font-size:15px;margin:4px 0 0;max-width:70ch}
+.tasksel{display:grid;gap:6px}
+.tasksel button{text-align:left;background:var(--panel-2);border:1.5px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 12px;font:15px/1.35 var(--f-body);cursor:pointer}
+.tasksel button b{font-family:var(--f-mono);color:var(--lamp);margin-right:6px}
+.tasksel button[aria-pressed="true"]{border-color:var(--lamp);background:#2a2412}
+.tasksel button.solved{box-shadow:inset 3px 0 0 var(--ok)}
+
+/* Schritt 3: Regeln und Zeichnungen */
+.rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+@media (max-width:760px){.rules{grid-template-columns:minmax(0,1fr)}}
+.rule{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:start}
+.rule svg{grid-row:span 2;width:72px;height:44px}
+.rule b{font:600 17px/1.2 var(--f-display)}
+.rule span{font-size:14px;color:var(--muted)}
+.draws{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:900px){.draws{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.draws{grid-template-columns:minmax(0,1fr)}}
+.draw{background:var(--panel);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px 12px;display:grid;gap:8px;min-width:0}
+.draw.ok{border-color:var(--ok)} .draw.bad{border-color:var(--bad)}
+.draw svg{width:100%;height:auto;background:#0a0d13;border-radius:8px}
+.draw .lbl{font:600 11px var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.draw .two{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.draw .two button{background:var(--panel-2);border:1.5px solid var(--line);color:var(--ink);border-radius:8px;padding:7px;font:600 14px var(--f-body);cursor:pointer}
+.draw .two button[aria-pressed="true"]{border-color:var(--lamp);background:#2a2412}
+.draw .why{font-size:14px;margin:0;color:var(--ink)}
+
+/* Schritt 5: Merksätze */
+.merk{display:grid;gap:12px}
+.merk p{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:17px;line-height:2.1;max-width:85ch}
+.merk p b.n{font:600 12px var(--f-mono);color:var(--lamp);margin-right:8px;vertical-align:2px}
+.merk select{font:600 16px var(--f-body);background:var(--panel-2);color:var(--ink);border:1.5px solid #3d4860;border-radius:6px;padding:2px 6px;max-width:100%}
+.merk select.ok{border-color:var(--ok);background:var(--ok-bg)} .merk select.bad{border-color:var(--bad);background:var(--bad-bg)}
+footer{margin-top:28px;color:var(--muted);font-size:13px;max-width:75ch}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ffcf6e"/></marker>
+    <marker id="arrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ff9a85"/></marker>
+    <g id="g-lamp"><circle r="11" fill="#ffcf6e" opacity=".25"/><circle r="7" fill="#fff4d6" stroke="#ffcf6e" stroke-width="2"/></g>
+    <g id="g-sun"><circle r="9" fill="#ffcf6e"/><g stroke="#ffcf6e" stroke-width="2" stroke-linecap="round"><path d="M0-15v4M0 11v4M-15 0h4M11 0h4M-10.6-10.6l2.8 2.8M7.8 7.8l2.8 2.8M-10.6 10.6l2.8-2.8M7.8-7.8l2.8-2.8"/></g></g>
+    <g id="g-book"><rect x="-11" y="-14" width="22" height="28" rx="2" fill="#c8553d"/><rect x="-8" y="-11" width="3" height="22" fill="#8e3626"/></g>
+    <g id="g-eye"><path d="M-14 0 Q0 -11 14 0 Q0 11 -14 0Z" fill="#e9e4d8"/><circle r="5" fill="#3d6fb5"/><circle r="2.3" fill="#0a0d13"/></g>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Licht<span>labor</span> Sehen</h1>
+      <p class="lede">Lichtquellen, beleuchtete Körper, wie wir sehen und wie man Lichtstrahlen zeichnet. Arbeite die fünf Schritte der Reihe nach durch.</p>
+    </div>
+  </header>
+
+  <details class="teach">
+    <summary>Für die Lehrkraft: Stundenverlauf und Ziele</summary>
+    <div class="tblwrap"><table>
+      <thead><tr><th>Schritt</th><th>Inhalt</th><th>Sozialform</th><th>Zeit</th></tr></thead>
+      <tbody>
+        <tr><td>1 Lichtquellen</td><td>17 Karten in natürliche, künstliche Lichtquellen und beleuchtete Körper sortieren</td><td>Partnerarbeit</td><td>8 min</td></tr>
+        <tr><td>2 Wie sehen wir?</td><td>Szene mit Lampe, Buch, Auge und Wand erforschen, drei Forscheraufträge, Frage zum Sehen</td><td>Partnerarbeit</td><td>12 min</td></tr>
+        <tr><td>3 Lichtstrahlmodell</td><td>Drei Zeichenregeln, sechs Zeichnungen als richtig oder falsch bewerten</td><td>Einzelarbeit</td><td>8 min</td></tr>
+        <tr><td>4 Lichtweg zeichnen</td><td>In drei Situationen die nötigen Lichtstrahlen einzeichnen und prüfen lassen</td><td>Einzelarbeit</td><td>10 min</td></tr>
+        <tr><td>5 Merksätze</td><td>Lückentext zur Sicherung, Besprechung im Plenum</td><td>Plenum</td><td>7 min</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>Ziele:</b> Die Schülerinnen und Schüler unterscheiden natürliche und künstliche Lichtquellen von beleuchteten Körpern. Sie erklären das Sehen mit dem Sender-Empfänger-Modell und zeichnen Lichtstrahlen als gerade Linien mit Pfeil, die an der Lichtquelle beginnen.</p>
+    <p><b>Typische Fehlvorstellungen, die die Stunde aufgreift:</b> Vom Auge gehen „Sehstrahlen“ aus. Mond, Spiegel und Katzenaugen leuchten selbst. Ein Gegenstand ist sichtbar, sobald es im Raum hell ist, auch wenn kein Licht von ihm ins Auge gelangt.</p>
+  </details>
+
+  <nav class="steps" role="tablist" id="steps"></nav>
+
+  <!-- Schritt 1 -->
+  <section class="phase" id="p0">
+    <h2>Lichtquelle oder nicht?</h2>
+    <p class="intro">Tippe eine Karte an und dann das passende Feld, oder ziehe sie direkt hinein. Frage dich bei jeder Karte: Leuchtet das selbst? Und wenn ja: Gibt es das in der Natur, oder hat der Mensch es gemacht?</p>
+    <div class="pool" id="pool"></div>
+    <div class="bins">
+      <div class="bin" data-bin="nat" tabindex="0" role="button" aria-label="Natürliche Lichtquelle"><header><b>Natürliche Lichtquelle</b><span>leuchtet selbst, kommt in der Natur vor</span></header><div class="slot"></div></div>
+      <div class="bin" data-bin="kun" tabindex="0" role="button" aria-label="Künstliche Lichtquelle"><header><b>Künstliche Lichtquelle</b><span>leuchtet selbst, vom Menschen gemacht</span></header><div class="slot"></div></div>
+      <div class="bin" data-bin="bel" tabindex="0" role="button" aria-label="Beleuchteter Körper"><header><b>Beleuchteter Körper</b><span>leuchtet nicht selbst, wirft Licht zurück</span></header><div class="slot"></div></div>
+    </div>
+    <div class="btns" style="margin-top:14px"><button class="btn primary" id="sortCheck">Überprüfen</button><button class="btn" id="sortReset">Neu mischen</button><span class="score" id="sortScore"></span></div>
+    <div class="fb" id="sortFb"></div>
+    <div class="next"><button class="btn" data-go="1">Weiter zu Schritt 2</button></div>
+  </section>
+
+  <!-- Schritt 2 -->
+  <section class="phase" id="p1" hidden>
+    <h2>Wie sehen wir?</h2>
+    <p class="intro">Im Zimmer stehen eine Lampe, ein Buch und ein Auge. Verschiebe alles mit Finger oder Maus, schalte die Lampe an und aus und stelle eine Wand dazwischen. Finde heraus, wann das Auge etwas sieht.</p>
+    <div class="scene">
+      <div class="stagebox"><canvas class="stage" id="cv2" aria-label="Zimmer mit Lampe, Buch und Auge"></canvas><p class="hint">Verschiebbar: Lampe, Buch, Auge und Wand.</p></div>
+      <div class="side">
+        <div class="card"><h3>Einstellungen</h3><div class="ctls" id="ctl2"></div></div>
+        <div class="card"><h3>Was sieht das Auge?</h3><div class="status" id="status2"></div></div>
+      </div>
+    </div>
+    <div class="scene" style="margin-top:18px">
+      <div class="card"><h3>Forscheraufträge</h3><ul class="quests" id="quests"></ul></div>
+      <div class="card"><h3>Deine Erklärung</h3>
+        <div>Was muss passieren, damit wir einen Gegenstand sehen?</div>
+        <div class="quiz" id="quiz2"></div><p class="quiz-fb" id="quiz2fb"></p>
+      </div>
+    </div>
+    <div class="next"><button class="btn" data-go="2">Weiter zu Schritt 3</button></div>
+  </section>
+
+  <!-- Schritt 3 -->
+  <section class="phase" id="p2" hidden>
+    <h2>Das Lichtstrahlmodell</h2>
+    <p class="intro">Licht selbst ist kein Strich. Damit wir den Weg des Lichts aufzeichnen können, benutzen wir ein Modell: den Lichtstrahl. Für ihn gelten drei Regeln.</p>
+    <div class="rules">
+      <div class="rule"><svg viewBox="0 0 72 44" aria-hidden="true"><line x1="6" y1="30" x2="66" y2="14" stroke="#ffcf6e" stroke-width="2.5"/><rect x="4" y="34" width="62" height="7" rx="1" fill="none" stroke="#949daf"/></svg><b>Gerade Linie</b><span>Licht breitet sich geradlinig aus. Zeichne mit dem Lineal.</span></div>
+      <div class="rule"><svg viewBox="0 0 72 44" aria-hidden="true"><line x1="6" y1="22" x2="64" y2="22" stroke="#ffcf6e" stroke-width="2.5" marker-end="url(#arr)"/></svg><b>Mit Pfeil</b><span>Der Pfeil zeigt, in welche Richtung das Licht läuft.</span></div>
+      <div class="rule"><svg viewBox="0 0 72 44" aria-hidden="true"><use href="#g-lamp" x="14" y="22"/><line x1="24" y1="22" x2="66" y2="22" stroke="#ffcf6e" stroke-width="2.5" marker-end="url(#arr)"/></svg><b>Von der Quelle weg</b><span>Lichtstrahlen beginnen an einer Lichtquelle oder einem beleuchteten Körper und enden im Auge.</span></div>
+    </div>
+    <div class="card" style="margin-bottom:12px"><h3>Richtig gezeichnet?</h3><div style="max-width:70ch">Prüfe die sechs Zeichnungen. Entscheide jeweils, ob der Lichtweg richtig gezeichnet ist. Dann tippe auf „Überprüfen“.</div></div>
+    <div class="draws" id="draws"></div>
+    <div class="btns" style="margin-top:14px"><button class="btn primary" id="drawCheck">Überprüfen</button><button class="btn" id="drawReset">Zurücksetzen</button><span class="score" id="drawScore"></span></div>
+    <div class="next"><button class="btn" data-go="3">Weiter zu Schritt 4</button></div>
+  </section>
+
+  <!-- Schritt 4 -->
+  <section class="phase" id="p3" hidden>
+    <h2>Zeichne den Lichtweg</h2>
+    <p class="intro">Ziehe mit dem Finger oder der Maus von einem Gegenstand zu einem anderen. Daraus wird ein gerader Lichtstrahl mit Pfeil, er zeigt in die Richtung, in die du gezogen hast. Zeichne nur die Lichtstrahlen, die nötig sind.</p>
+    <div class="scene">
+      <div class="stagebox"><canvas class="stage" id="cv4" aria-label="Zeichenfläche für Lichtstrahlen"></canvas><p class="hint" id="hint4">Ziehe von der Lichtquelle zu einem Gegenstand.</p></div>
+      <div class="side">
+        <div class="card"><h3>Aufgabe</h3><div class="tasksel" id="tasks4"></div></div>
+        <div class="card"><div class="btns"><button class="btn primary" id="t4check">Überprüfen</button><button class="btn" id="t4undo">Rückgängig</button><button class="btn" id="t4clear">Alles löschen</button></div><div class="fb" id="t4fb"></div></div>
+      </div>
+    </div>
+    <div class="next"><button class="btn" data-go="4">Weiter zu Schritt 5</button></div>
+  </section>
+
+  <!-- Schritt 5 -->
+  <section class="phase" id="p4" hidden>
+    <h2>Das haben wir gelernt</h2>
+    <p class="intro">Wähle in jeder Lücke das passende Wort. Mit „Überprüfen“ siehst du, was schon stimmt.</p>
+    <div class="merk" id="merk"></div>
+    <div class="btns" style="margin-top:14px"><button class="btn primary" id="merkCheck">Überprüfen</button><button class="btn" id="merkReset">Zurücksetzen</button><span class="score" id="merkScore"></span></div>
+  </section>
+
+  <footer>Teil der Reihe Lichtlabor. Die Szenen zeigen Licht im Modell der geometrischen Optik.</footer>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Navigation ---------- */
+const STEPS=['Lichtquellen','Wie sehen wir?','Lichtstrahlmodell','Lichtweg zeichnen','Merksätze'];
+const done=[0,0,0,0,0];let cur=0;
+function renderSteps(){
+  $('#steps').innerHTML=STEPS.map((s,i)=>`<button class="step${done[i]?' done':''}" role="tab" aria-selected="${i===cur}" data-i="${i}"><small>Schritt ${i+1}</small><b>${s}</b></button>`).join('');
+  $$('#steps .step').forEach(b=>b.addEventListener('click',()=>go(+b.dataset.i)));
+}
+function go(i){cur=i;$$('section.phase').forEach((s,k)=>s.hidden=k!==i);renderSteps();
+  if(i===1)stage2.resize();if(i===3)stage4.resize();
+  try{localStorage.setItem('ll-sehen-step',i)}catch(e){}
+  window.scrollTo({top:Math.min(window.scrollY,$('#steps').offsetTop-8)});}
+function markDone(i){if(!done[i]){done[i]=1;renderSteps();}}
+$$('[data-go]').forEach(b=>b.addEventListener('click',()=>go(+b.dataset.go)));
+
+/* ---------- Schritt 1: Sortieren ---------- */
+const ITEMS=[
+ ['sonne','☀️','Sonne','nat','Die Sonne leuchtet selbst. Niemand hat sie gemacht.'],
+ ['sterne','⭐','Sterne','nat','Sterne sind weit entfernte Sonnen. Sie leuchten selbst.'],
+ ['blitz','⚡','Blitz','nat','Ein Blitz entsteht beim Gewitter in der Natur und leuchtet selbst.'],
+ ['kaefer','🪲','Glühwürmchen','nat','Glühwürmchen erzeugen ihr Licht selbst in ihrem Körper.'],
+ ['lava','🌋','glühende Lava','nat','Lava ist so heiß, dass sie selbst leuchtet.'],
+ ['gluehlampe','💡','Glühlampe','kun','Eine Glühlampe leuchtet selbst und wurde vom Menschen gebaut.'],
+ ['taschenlampe','🔦','Taschenlampe','kun','Eine Taschenlampe leuchtet selbst und wurde vom Menschen gebaut.'],
+ ['kerze','🕯️','Kerze','kun','Die Flamme einer Kerze leuchtet selbst. Die Kerze hat der Mensch gemacht.'],
+ ['handy','📱','Handy-Bildschirm','kun','Ein Bildschirm leuchtet selbst, auch im dunklen Zimmer.'],
+ ['ampel','🚦','Ampel','kun','Die Lampen einer Ampel leuchten selbst.'],
+ ['feuerwerk','🎆','Feuerwerk','kun','Feuerwerk leuchtet selbst und wird vom Menschen hergestellt.'],
+ ['mond','🌕','Mond','bel','Der Mond leuchtet nicht selbst. Er wird von der Sonne beleuchtet und wirft ihr Licht zurück.'],
+ ['spiegel','🪞','Spiegel','bel','Ein Spiegel wirft Licht nur zurück. Im dunklen Raum bleibt er dunkel.'],
+ ['buch','📕','Buch','bel','Ein Buch sieht man nur, wenn Licht darauf fällt.'],
+ ['rueck','🚲','Rückstrahler am Fahrrad','bel','Ein Rückstrahler leuchtet nicht selbst. Er wirft das Licht von Scheinwerfern zurück.'],
+ ['katze','🐱','Katzenaugen im Dunkeln','bel','Katzenaugen leuchten nicht selbst. Sie werfen Licht besonders gut zurück.'],
+ ['wolke','☁️','Wolke','bel','Eine Wolke leuchtet nicht selbst. Sie wird von der Sonne beleuchtet.'],
+];
+const place={};let sel=null;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function itemEl(it){const b=document.createElement('button');b.className='item';b.dataset.id=it[0];b.setAttribute('aria-pressed','false');
+  b.innerHTML=`<span class="ico" aria-hidden="true">${it[1]}</span>${it[2]}`;attachDrag(b);return b;}
+function buildSort(){
+  $('#pool').innerHTML='';$$('.bin .slot').forEach(s=>s.innerHTML='');$('#sortFb').innerHTML='';$('#sortScore').textContent='';
+  for(const k in place)delete place[k];sel=null;
+  shuffle(ITEMS.slice()).forEach(it=>$('#pool').appendChild(itemEl(it)));
+}
+function clearMarks(){$$('.item').forEach(e=>e.classList.remove('ok','bad'));$('#sortScore').textContent='';$('#sortFb').innerHTML='';}
+function select(el){$$('.item').forEach(e=>e.setAttribute('aria-pressed','false'));sel=el;if(el)el.setAttribute('aria-pressed','true');}
+function moveTo(el,bin){
+  if(bin){$(`.bin[data-bin="${bin}"] .slot`).appendChild(el);place[el.dataset.id]=bin;}
+  else{$('#pool').appendChild(el);delete place[el.dataset.id];}
+  select(null);clearMarks();
+}
+let dragInfo=null;
+function attachDrag(el){
+  el.addEventListener('pointerdown',e=>{dragInfo={el,x:e.clientX,y:e.clientY,moved:false,ghost:null,id:e.pointerId};el.setPointerCapture(e.pointerId);});
+  el.addEventListener('pointermove',e=>{
+    if(!dragInfo||dragInfo.el!==el)return;
+    if(!dragInfo.moved&&Math.hypot(e.clientX-dragInfo.x,e.clientY-dragInfo.y)>8){
+      dragInfo.moved=true;const g=el.cloneNode(true);g.classList.add('ghost');document.body.appendChild(g);dragInfo.ghost=g;el.style.opacity='.35';}
+    if(dragInfo.moved){const g=dragInfo.ghost;g.style.left=(e.clientX-g.offsetWidth/2)+'px';g.style.top=(e.clientY-g.offsetHeight/2)+'px';
+      $$('.bin').forEach(b=>b.classList.remove('hot'));const t=binAt(e.clientX,e.clientY);if(t)t.classList.add('hot');}
+  });
+  const end=e=>{
+    if(!dragInfo||dragInfo.el!==el)return;
+    const d=dragInfo;dragInfo=null;el.style.opacity='';$$('.bin').forEach(b=>b.classList.remove('hot'));
+    if(d.moved){d.ghost.remove();const t=binAt(e.clientX,e.clientY);
+      if(t)moveTo(el,t.dataset.bin);else if(document.elementFromPoint(e.clientX,e.clientY)?.closest('#pool'))moveTo(el,null);}
+    else{ if(place[el.dataset.id]&&sel!==el){select(el);} else select(sel===el?null:el); }
+  };
+  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',e=>{if(dragInfo&&dragInfo.ghost)dragInfo.ghost.remove();el.style.opacity='';dragInfo=null;});
+}
+function binAt(x,y){const n=document.elementFromPoint(x,y);return n?n.closest('.bin'):null;}
+$$('.bin').forEach(b=>{
+  const act=e=>{if(e.target.closest('.item'))return;if(sel)moveTo(sel,b.dataset.bin);};
+  b.addEventListener('click',act);b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(sel)moveTo(sel,b.dataset.bin);}});
+});
+$('#pool').addEventListener('click',e=>{if(e.target===$('#pool')&&sel)moveTo(sel,null);});
+$('#sortCheck').addEventListener('click',()=>{
+  let right=0;const fb=[];
+  ITEMS.forEach(it=>{const el=$(`.item[data-id="${it[0]}"]`);const p=place[it[0]];
+    el.classList.remove('ok','bad');if(!p)return;
+    if(p===it[3]){el.classList.add('ok');right++;}else{el.classList.add('bad');fb.push(`<p><b>${it[2]}:</b> ${it[4]}</p>`);}});
+  const placed=Object.keys(place).length;
+  $('#sortScore').textContent=`${right} von ${ITEMS.length} richtig`+(placed<ITEMS.length?` · ${ITEMS.length-placed} noch nicht einsortiert`:'');
+  $('#sortFb').innerHTML=fb.join('')+(right===ITEMS.length?'<p class="good">Alles richtig. Lichtquellen leuchten selbst, beleuchtete Körper werfen nur Licht zurück.</p>':'');
+  if(right===ITEMS.length)markDone(0);
+});
+$('#sortReset').addEventListener('click',buildSort);
+buildSort();
+
+/* ---------- Zeichenfläche (gemeinsam für Schritt 2 und 4) ---------- */
+const W=100,H=60;
+function makeStage(cv){
+  const s={cv,ctx:cv.getContext('2d'),sc:8,dpr:1};
+  s.X=x=>x*s.sc;s.Y=y=>(H/2-y)*s.sc;
+  s.resize=()=>{const w=cv.parentElement.clientWidth;if(!w)return;const h=Math.round(w*.6);s.dpr=window.devicePixelRatio||1;
+    cv.width=Math.round(w*s.dpr);cv.height=Math.round(h*s.dpr);cv.style.height=h+'px';s.sc=w/W;};
+  s.world=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/s.sc,y:H/2-(e.clientY-r.top)/s.sc};};
+  new ResizeObserver(()=>s.resize()).observe(cv.parentElement);
+  return s;
+}
+function glow(s,x,y,rgb,rad,a){const c=s.ctx,g=c.createRadialGradient(s.X(x),s.Y(y),0,s.X(x),s.Y(y),rad*s.sc);
+  g.addColorStop(0,`rgba(${rgb},${a})`);g.addColorStop(1,`rgba(${rgb},0)`);c.fillStyle=g;c.beginPath();c.arc(s.X(x),s.Y(y),rad*s.sc,0,7);c.fill();}
+function lampG(s,x,y,on){const c=s.ctx;if(on)glow(s,x,y,'255,214,140',9,.6);
+  c.fillStyle='#3c465b';c.fillRect(s.X(x-1.2),s.Y(y-2.6),2.4*s.sc,1.6*s.sc);
+  c.beginPath();c.arc(s.X(x),s.Y(y),2.2*s.sc,0,7);c.fillStyle=on?'#fff6dc':'#4b5263';c.fill();c.strokeStyle=on?'#ffcf6e':'#6b7385';c.lineWidth=2;c.stroke();}
+function eyeG(s,x,y,open){const c=s.ctx,X=s.X,Y=s.Y,k=s.sc;
+  c.save();c.translate(X(x),Y(y));
+  if(open){c.beginPath();c.moveTo(-4*k,0);c.quadraticCurveTo(0,-3.4*k,4*k,0);c.quadraticCurveTo(0,3.4*k,-4*k,0);c.closePath();
+    c.fillStyle='#e9e4d8';c.fill();c.strokeStyle='#bfb8a8';c.lineWidth=1.5;c.stroke();
+    c.beginPath();c.arc(-1*k,0,1.5*k,0,7);c.fillStyle='#3d6fb5';c.fill();c.beginPath();c.arc(-1*k,0,.7*k,0,7);c.fillStyle='#07090d';c.fill();}
+  else{c.strokeStyle='#bfb8a8';c.lineWidth=2;c.beginPath();c.moveTo(-4*k,0);c.quadraticCurveTo(0,2.4*k,4*k,0);c.stroke();
+    for(const t of [-2.4,-.8,.8,2.4]){c.beginPath();c.moveTo(t*k,1.4*k*(1-Math.abs(t)/5));c.lineTo(t*1.15*k,2.6*k);c.stroke();}}
+  c.restore();}
+function label(s,t,x,y,col='#949daf'){const c=s.ctx;c.font=`600 ${Math.max(11,Math.round(s.sc*1.5))}px "JetBrains Mono", ui-monospace, monospace`;
+  c.fillStyle=col;c.textAlign='center';c.textBaseline='middle';c.fillText(t,s.X(x),s.Y(y));}
+function ray(s,a,b,ra,rb,col,w=2.5,dash=true,t=0){
+  const c=s.ctx,dx=b.x-a.x,dy=b.y-a.y,L=Math.hypot(dx,dy);if(L<ra+rb+1)return;
+  const ux=dx/L,uy=dy/L,x1=a.x+ux*ra,y1=a.y+uy*ra,x2=b.x-ux*rb,y2=b.y-uy*rb;
+  c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=w;c.lineCap='round';
+  if(dash){c.setLineDash([10,8]);c.lineDashOffset=reduce?0:-t*.04;}
+  c.beginPath();c.moveTo(s.X(x1),s.Y(y1));c.lineTo(s.X(x2),s.Y(y2));c.stroke();c.setLineDash([]);
+  const ang=Math.atan2(s.Y(y2)-s.Y(y1),s.X(x2)-s.X(x1)),h=Math.max(9,s.sc*1.4);
+  c.beginPath();c.moveTo(s.X(x2),s.Y(y2));c.lineTo(s.X(x2)-Math.cos(ang-.45)*h,s.Y(y2)-Math.sin(ang-.45)*h);
+  c.lineTo(s.X(x2)-Math.cos(ang+.45)*h,s.Y(y2)-Math.sin(ang+.45)*h);c.closePath();c.fill();c.restore();
+}
+function segX(a,b,c,d){const r=(b.x-a.x)*(d.y-c.y)-(b.y-a.y)*(d.x-c.x);if(Math.abs(r)<1e-9)return false;
+  const t=((c.x-a.x)*(d.y-c.y)-(c.y-a.y)*(d.x-c.x))/r,u=((c.x-a.x)*(b.y-a.y)-(c.y-a.y)*(b.x-a.x))/r;return t>0&&t<1&&u>=0&&u<=1;}
+function segCircle(a,b,c,r){const dx=b.x-a.x,dy=b.y-a.y,L2=dx*dx+dy*dy;const t=clamp(((c.x-a.x)*dx+(c.y-a.y)*dy)/L2,0,1);
+  return Math.hypot(a.x+dx*t-c.x,a.y+dy*t-c.y)<r;}
+
+/* ---------- Schritt 2: Wie sehen wir? ---------- */
+const stage2=makeStage($('#cv2'));
+const S2={lamp:{x:16,y:16},book:{x:52,y:-14},eye:{x:86,y:6},wall:{x:68,y:2},lampOn:true,eyeOpen:true,wallOn:false,path:true};
+const WALLH=13;
+function wallSeg(){return[{x:S2.wall.x,y:S2.wall.y+WALLH},{x:S2.wall.x,y:S2.wall.y-WALLH}];}
+function clear(a,b){if(!S2.wallOn)return true;const [p,q]=wallSeg();return !segX(a,b,p,q);}
+function state2(){
+  const lampToEye=clear(S2.lamp,S2.eye),lampToBook=clear(S2.lamp,S2.book),bookToEye=clear(S2.book,S2.eye);
+  const bookLit=S2.lampOn&&lampToBook;
+  const seesLamp=S2.lampOn&&S2.eyeOpen&&lampToEye;
+  const seesBook=S2.eyeOpen&&bookLit&&bookToEye;
+  let rL,rB;
+  if(!S2.lampOn)rL='Die Lampe ist aus. Sie sendet kein Licht aus.';
+  else if(!lampToEye)rL='Die Wand hält das Licht der Lampe auf, bevor es ins Auge gelangt.';
+  else if(!S2.eyeOpen)rL='Licht der Lampe kommt zwar an, aber das Auge ist geschlossen.';
+  else rL='Licht läuft von der Lampe direkt ins Auge.';
+  if(!S2.lampOn)rB='Das Buch leuchtet nicht selbst. Ohne Licht von der Lampe bleibt es dunkel.';
+  else if(!lampToBook)rB='Die Wand steht zwischen Lampe und Buch. Das Buch wird nicht beleuchtet.';
+  else if(!bookToEye)rB='Das Buch wird beleuchtet, aber die Wand hält sein Licht vor dem Auge auf.';
+  else if(!S2.eyeOpen)rB='Licht vom Buch kommt zwar an, aber das Auge ist geschlossen.';
+  else rB='Licht läuft von der Lampe zum Buch. Das Buch wirft Licht zurück, ein Teil gelangt ins Auge.';
+  return{bookLit,seesLamp,seesBook,rL,rB,lampToEye,lampToBook,bookToEye};
+}
+const QUESTS=[
+  ['Das Auge sieht die Lampe, aber nicht das Buch.',s=>s.seesLamp&&!s.seesBook],
+  ['Das Auge sieht das Buch, aber nicht die Lampe.',s=>s.seesBook&&!s.seesLamp],
+  ['Die Lampe ist an und das Auge offen, aber es sieht gar nichts.',s=>S2.lampOn&&S2.eyeOpen&&!s.seesLamp&&!s.seesBook],
+];
+const questHit=[0,0,0];
+$('#quests').innerHTML=QUESTS.map((q,i)=>`<li id="q${i}"><i></i><span>${q[0]}</span></li>`).join('');
+const T2=[['lampOn','Lampe an'],['eyeOpen','Auge offen'],['wallOn','Wand aufstellen'],['path','Lichtweg anzeigen']];
+$('#ctl2').innerHTML=T2.map(t=>`<button class="tog" data-k="${t[0]}" aria-pressed="${S2[t[0]]}">${t[1]}</button>`).join('');
+$$('#ctl2 .tog').forEach(b=>b.addEventListener('click',()=>{S2[b.dataset.k]=!S2[b.dataset.k];b.setAttribute('aria-pressed',S2[b.dataset.k]);}));
+let lastStatus='';
+function draw2(t){
+  const s=stage2,c=s.ctx;if(!s.cv.width)return;c.setTransform(s.dpr,0,0,s.dpr,0,0);
+  const st=state2();
+  c.fillStyle='#07090d';c.fillRect(0,0,s.X(W),H*s.sc);
+  if(S2.lampOn){
+    glow(s,S2.lamp.x,S2.lamp.y,'255,214,140',75,.30);
+    if(S2.wallOn){const [p,q]=wallSeg(),L=S2.lamp;
+      const far=(P)=>{const dx=P.x-L.x,dy=P.y-L.y,n=Math.hypot(dx,dy)||1;return{x:P.x+dx/n*250,y:P.y+dy/n*250};};
+      const p2=far(p),q2=far(q);c.fillStyle='rgba(7,9,13,.88)';c.beginPath();
+      [p,q,q2,p2].forEach((P,i)=>i?c.lineTo(s.X(P.x),s.Y(P.y)):c.moveTo(s.X(P.x),s.Y(P.y)));c.closePath();c.fill();}
+  }
+  // Fußboden
+  c.fillStyle=S2.lampOn?'#1a1f2a':'#0e1118';c.fillRect(0,s.Y(-24),s.X(W),6*s.sc);
+  // Lichtwege
+  if(S2.path&&S2.lampOn){
+    for(let i=0;i<14;i++){const a=i/14*Math.PI*2;ray(s,S2.lamp,{x:S2.lamp.x+Math.cos(a)*9,y:S2.lamp.y+Math.sin(a)*9},3,0,'rgba(255,214,140,.35)',1.5,false);}
+    if(st.bookLit){for(let i=0;i<10;i++){const a=i/10*Math.PI*2+.3;ray(s,S2.book,{x:S2.book.x+Math.cos(a)*9,y:S2.book.y+Math.sin(a)*9},4.5,0,'rgba(255,150,120,.4)',1.5,false);}
+      ray(s,S2.lamp,S2.book,3,4.5,'#ffcf6e',2.5,true,t);}
+    if(st.bookLit&&st.bookToEye)ray(s,S2.book,S2.eye,4.5,4.5,'#ff9a85',2.5,true,t);
+    if(st.lampToEye)ray(s,S2.lamp,S2.eye,3,4.5,'#ffcf6e',2.5,true,t);
+  }
+  // Buch
+  const B=S2.book,lit=st.bookLit;
+  c.fillStyle=lit?'#c8553d':'#2a1915';c.fillRect(s.X(B.x-3.5),s.Y(B.y+4.5),7*s.sc,9*s.sc);
+  c.fillStyle=lit?'#8e3626':'#1c110e';c.fillRect(s.X(B.x-2.6),s.Y(B.y+3.8),1*s.sc,7.6*s.sc);
+  c.fillStyle=lit?'#f2e6c9':'#2b2924';c.fillRect(s.X(B.x+3.5),s.Y(B.y+4),.7*s.sc,8*s.sc);
+  label(s,'Buch',B.x,B.y-6.6,lit?'#c9cfdb':'#4f5768');
+  // Wand
+  if(S2.wallOn){const [p,q]=wallSeg();c.fillStyle='#5b5145';c.fillRect(s.X(p.x-1),s.Y(p.y),2*s.sc,(p.y-q.y)*s.sc);
+    label(s,'Wand',p.x,p.y+2,'#949daf');}
+  lampG(s,S2.lamp.x,S2.lamp.y,S2.lampOn);label(s,'Lampe',S2.lamp.x,S2.lamp.y-5);
+  eyeG(s,S2.eye.x,S2.eye.y,S2.eyeOpen);label(s,'Auge',S2.eye.x,S2.eye.y-5);
+  // Griffe
+  handles2().forEach((h,i)=>{c.save();c.strokeStyle=drag2&&drag2.i===i?'#ffcf6e':'rgba(141,188,255,.7)';c.setLineDash([3,3]);c.lineWidth=1.5;
+    c.beginPath();c.arc(s.X(h.x),s.Y(h.y),Math.max(16,h.r*s.sc),0,7);c.stroke();c.restore();});
+  // Status
+  const key=[st.seesLamp,st.seesBook,st.rL,st.rB].join('|');
+  if(key!==lastStatus){lastStatus=key;
+    $('#status2').innerHTML=`<div class="st-row ${st.seesLamp?'yes':'no'}"><b>Sieht die Lampe:<em>${st.seesLamp?'ja':'nein'}</em></b><span>${st.rL}</span></div>
+      <div class="st-row ${st.seesBook?'yes':'no'}"><b>Sieht das Buch:<em>${st.seesBook?'ja':'nein'}</em></b><span>${st.rB}</span></div>`;
+    QUESTS.forEach((q,i)=>{if(!questHit[i]&&q[1](st)){questHit[i]=1;$('#q'+i).classList.add('hit');}});
+    if(questHit.every(Boolean)&&quizOk)markDone(1);
+  }
+}
+function handles2(){const h=[{o:S2.lamp,r:3.5,x:S2.lamp.x,y:S2.lamp.y},{o:S2.book,r:5,x:S2.book.x,y:S2.book.y},{o:S2.eye,r:4.5,x:S2.eye.x,y:S2.eye.y}];
+  if(S2.wallOn)h.push({o:S2.wall,r:4,x:S2.wall.x,y:S2.wall.y});return h;}
+let drag2=null;
+const cv2=$('#cv2');
+cv2.addEventListener('pointerdown',e=>{const p=stage2.world(e);let best=null,bd=1e9;
+  handles2().forEach((h,i)=>{const d=Math.hypot(h.x-p.x,h.y-p.y);if(d<Math.max(h.r+1.5,26/stage2.sc)&&d<bd){bd=d;best={i,o:h.o,dx:h.x-p.x,dy:h.y-p.y};}});
+  if(best){drag2=best;cv2.setPointerCapture(e.pointerId);e.preventDefault();}});
+cv2.addEventListener('pointermove',e=>{const p=stage2.world(e);
+  if(drag2){const o=drag2.o,isWall=o===S2.wall;o.x=clamp(p.x+drag2.dx,5,95);o.y=clamp(p.y+drag2.dy,isWall?-10:-18,isWall?16:24);}
+  else cv2.style.cursor=handles2().some(h=>Math.hypot(h.x-p.x,h.y-p.y)<Math.max(h.r+1.5,26/stage2.sc))?'grab':'default';});
+const end2=()=>{drag2=null;};cv2.addEventListener('pointerup',end2);cv2.addEventListener('pointercancel',end2);
+
+const QUIZ2=[
+  ['Aus dem Auge gehen Sehstrahlen zum Gegenstand.',false,'Nein. Vom Auge geht kein Licht aus. Probiere es aus: Schalte die Lampe aus. Das Auge ist offen, sieht aber nichts.'],
+  ['Licht muss vom Gegenstand in unser Auge gelangen.',true,'Richtig. Eine Lichtquelle sendet Licht aus (Sender). Es gelangt direkt oder über einen beleuchteten Körper ins Auge (Empfänger).'],
+  ['Es reicht, wenn es im Raum hell ist.',false,'Nein. Stelle die Wand zwischen Buch und Auge: Der Raum ist hell, aber das Auge sieht das Buch nicht. Das Licht muss ins Auge gelangen.'],
+];
+let quizOk=false;
+$('#quiz2').innerHTML=QUIZ2.map((q,i)=>`<button class="opt" data-i="${i}">${q[0]}</button>`).join('');
+$$('#quiz2 .opt').forEach(b=>b.addEventListener('click',()=>{const q=QUIZ2[+b.dataset.i];
+  $$('#quiz2 .opt').forEach(o=>o.classList.remove('ok','bad'));b.classList.add(q[1]?'ok':'bad');$('#quiz2fb').textContent=q[2];
+  if(q[1]){quizOk=true;if(questHit.every(Boolean))markDone(1);}}));
+
+/* ---------- Schritt 3: Zeichnungen prüfen ---------- */
+const DR=[
+ {ok:true,svg:`<use href="#g-lamp" x="34" y="60"/><use href="#g-book" x="186" y="60"/><line x1="46" y1="60" x2="170" y2="60" stroke="#ffcf6e" stroke-width="3" marker-end="url(#arr)"/>`,
+  why:'Richtig: gerade Linie, der Pfeil zeigt von der Lampe zum Buch.'},
+ {ok:false,svg:`<use href="#g-lamp" x="34" y="60"/><use href="#g-book" x="186" y="60"/><line x1="46" y1="60" x2="172" y2="60" stroke="#ffcf6e" stroke-width="3"/>`,
+  why:'Falsch: Der Pfeil fehlt. Man weiß nicht, in welche Richtung das Licht läuft.'},
+ {ok:false,svg:`<use href="#g-eye" x="34" y="60"/><use href="#g-book" x="186" y="60"/><line x1="52" y1="60" x2="170" y2="60" stroke="#ffcf6e" stroke-width="3" marker-end="url(#arr)"/>`,
+  why:'Falsch: Vom Auge geht kein Licht aus. Das Licht muss ins Auge hinein laufen.'},
+ {ok:false,svg:`<use href="#g-lamp" x="34" y="60"/><use href="#g-book" x="186" y="60"/><path d="M46 60 C 80 10, 120 110, 170 60" fill="none" stroke="#ffcf6e" stroke-width="3" marker-end="url(#arr)"/>`,
+  why:'Falsch: Licht breitet sich geradlinig aus. Lichtstrahlen zeichnet man mit dem Lineal.'},
+ {ok:true,svg:`<use href="#g-sun" x="30" y="30"/><use href="#g-book" x="110" y="84"/><use href="#g-eye" x="196" y="34"/><line x1="42" y1="38" x2="96" y2="74" stroke="#ffcf6e" stroke-width="3" marker-end="url(#arr)"/><line x1="124" y1="74" x2="178" y2="40" stroke="#ffcf6e" stroke-width="3" marker-end="url(#arr)"/>`,
+  why:'Richtig: Die Sonne beleuchtet das Buch, das Buch wirft Licht ins Auge.'},
+ {ok:false,svg:`<use href="#g-lamp" x="34" y="60"/><use href="#g-book" x="186" y="60"/><line x1="172" y1="60" x2="48" y2="60" stroke="#ffcf6e" stroke-width="3" marker-end="url(#arr)"/>`,
+  why:'Falsch: Der Pfeil zeigt zur Lampe. Licht geht aber von der Lichtquelle aus.'},
+];
+const ans={};
+function buildDraws(){
+  $('#draws').innerHTML=DR.map((d,i)=>`<div class="draw" id="dr${i}"><span class="lbl">Zeichnung ${String.fromCharCode(65+i)}</span>
+    <svg viewBox="0 0 220 120" role="img" aria-label="Zeichnung ${String.fromCharCode(65+i)}">${d.svg}</svg>
+    <div class="two"><button data-i="${i}" data-v="1" aria-pressed="false">richtig</button><button data-i="${i}" data-v="0" aria-pressed="false">falsch</button></div><p class="why" hidden></p></div>`).join('');
+  $$('#draws .two button').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.i;ans[i]=b.dataset.v==='1';
+    b.parentElement.querySelectorAll('button').forEach(o=>o.setAttribute('aria-pressed',o===b));
+    const c=$('#dr'+i);c.classList.remove('ok','bad');c.querySelector('.why').hidden=true;$('#drawScore').textContent='';}));
+}
+$('#drawCheck').addEventListener('click',()=>{let r=0,n=0;
+  DR.forEach((d,i)=>{const c=$('#dr'+i),w=c.querySelector('.why');c.classList.remove('ok','bad');if(ans[i]===undefined){w.hidden=true;return;}
+    n++;const good=ans[i]===d.ok;if(good)r++;c.classList.add(good?'ok':'bad');w.textContent=d.why;w.hidden=false;});
+  $('#drawScore').textContent=`${r} von ${DR.length} richtig`+(n<DR.length?` · ${DR.length-n} noch offen`:'');if(r===DR.length)markDone(2);});
+$('#drawReset').addEventListener('click',()=>{for(const k in ans)delete ans[k];$('#drawScore').textContent='';buildDraws();});
+buildDraws();
+
+/* ---------- Schritt 4: Lichtweg zeichnen ---------- */
+const stage4=makeStage($('#cv4'));
+const NAMES={lamp:'Lampe',eye:'Auge',ball:'Ball',sun:'Sonne',moon:'Mond'};
+const TASKS=[
+  {title:'Das Kind sieht die Lampe.',night:false,objs:{lamp:{x:20,y:14,r:3.5,src:true},eye:{x:82,y:2,r:4.5}},need:[['lamp','eye']]},
+  {title:'Das Kind sieht den Ball.',night:false,objs:{lamp:{x:16,y:16,r:3.5,src:true},ball:{x:50,y:-12,r:4},eye:{x:86,y:8,r:4.5}},need:[['lamp','ball'],['ball','eye']]},
+  {title:'Das Kind sieht nachts den Mond.',night:true,earth:{x:68,y:-8,r:11},objs:{sun:{x:10,y:6,r:5,src:true},moon:{x:90,y:21,r:3.5},eye:{x:81.5,y:-3,r:3.2}},need:[['sun','moon'],['moon','eye']]},
+];
+let tk=0;const lines=TASKS.map(()=>[]);const solved=[0,0,0];let pend=null;
+$('#tasks4').innerHTML=TASKS.map((t,i)=>`<button data-i="${i}" aria-pressed="${i===0}"><b>${String.fromCharCode(97+i)})</b>${t.title}</button>`).join('');
+$$('#tasks4 button').forEach(b=>b.addEventListener('click',()=>{tk=+b.dataset.i;$$('#tasks4 button').forEach(o=>o.setAttribute('aria-pressed',o===b));$('#t4fb').innerHTML='';colors=null;}));
+let colors=null;
+function objAt(p){const T=TASKS[tk];let best=null,bd=1e9;for(const k in T.objs){const o=T.objs[k],d=Math.hypot(o.x-p.x,o.y-p.y);if(d<Math.max(o.r+2,24/stage4.sc)&&d<bd){bd=d;best=k;}}return best;}
+function draw4(t){
+  const s=stage4,c=s.ctx;if(!s.cv.width)return;c.setTransform(s.dpr,0,0,s.dpr,0,0);const T=TASKS[tk];
+  c.fillStyle=T.night?'#05070c':'#0d1119';c.fillRect(0,0,s.X(W),H*s.sc);
+  if(T.night){c.fillStyle='rgba(235,230,218,.5)';for(let i=0;i<40;i++){const x=(i*37.3)%100,y=((i*53.7)%56)-26;c.fillRect(s.X(x),s.Y(y),1.5,1.5);}}
+  else{c.fillStyle='#161b25';c.fillRect(0,s.Y(-24),s.X(W),6*s.sc);}
+  if(T.earth){const E=T.earth;glow(s,E.x,E.y,'90,140,220',E.r+3,.25);c.beginPath();c.arc(s.X(E.x),s.Y(E.y),E.r*s.sc,0,7);c.fillStyle='#24508f';c.fill();
+    c.fillStyle='#3f7a4a';c.beginPath();c.ellipse(s.X(E.x-3),s.Y(E.y+2),4*s.sc,3*s.sc,.4,0,7);c.fill();c.beginPath();c.ellipse(s.X(E.x+4),s.Y(E.y-4),3*s.sc,2*s.sc,-.3,0,7);c.fill();
+    // Nachtseite
+    c.save();c.beginPath();c.arc(s.X(E.x),s.Y(E.y),E.r*s.sc,-Math.PI/2,Math.PI/2);c.closePath();c.fillStyle='rgba(0,0,0,.45)';c.fill();c.restore();
+    label(s,'Erde',E.x,E.y-E.r-2.4);}
+  // Linien
+  lines[tk].forEach((l,i)=>{const a=T.objs[l[0]],b=T.objs[l[1]];const col=colors&&colors[i]?colors[i]:'#ffcf6e';ray(s,a,b,a.r,b.r,col,2.8,false);});
+  if(pend){const a=T.objs[pend.from];c.save();c.strokeStyle='rgba(255,207,110,.6)';c.setLineDash([6,6]);c.lineWidth=2;c.beginPath();c.moveTo(s.X(a.x),s.Y(a.y));c.lineTo(s.X(pend.x),s.Y(pend.y));c.stroke();c.restore();}
+  // Objekte
+  for(const k in T.objs){const o=T.objs[k];
+    if(k==='lamp'){lampG(s,o.x,o.y,true);}
+    else if(k==='sun'){glow(s,o.x,o.y,'255,200,90',14,.5);c.beginPath();c.arc(s.X(o.x),s.Y(o.y),o.r*s.sc,0,7);c.fillStyle='#ffcf6e';c.fill();}
+    else if(k==='moon'){c.beginPath();c.arc(s.X(o.x),s.Y(o.y),o.r*s.sc,0,7);c.fillStyle='#d8d3c4';c.fill();c.fillStyle='#b5af9f';
+      c.beginPath();c.arc(s.X(o.x-1),s.Y(o.y+.8),.8*s.sc,0,7);c.fill();c.beginPath();c.arc(s.X(o.x+1.2),s.Y(o.y-1),.6*s.sc,0,7);c.fill();}
+    else if(k==='ball'){c.beginPath();c.arc(s.X(o.x),s.Y(o.y),o.r*s.sc,0,7);c.fillStyle='#4f9d69';c.fill();c.strokeStyle='#e9e4d8';c.lineWidth=2;
+      c.beginPath();c.arc(s.X(o.x),s.Y(o.y),o.r*s.sc,-.6,.6);c.stroke();c.beginPath();c.arc(s.X(o.x),s.Y(o.y),o.r*s.sc,Math.PI-.6,Math.PI+.6);c.stroke();}
+    else if(k==='eye'){eyeG(s,o.x,o.y,true);}
+    label(s,NAMES[k]+(k==='eye'?' des Kindes':''),o.x,k==='moon'?o.y-6:o.y-o.r-2.8);
+  }
+}
+const cv4=$('#cv4');
+cv4.addEventListener('pointerdown',e=>{const p=stage4.world(e),o=objAt(p);if(!o){$('#hint4').textContent='Beginne einen Lichtstrahl an einem Gegenstand oder einer Lichtquelle.';return;}
+  pend={from:o,x:p.x,y:p.y};cv4.setPointerCapture(e.pointerId);e.preventDefault();});
+cv4.addEventListener('pointermove',e=>{const p=stage4.world(e);if(pend){pend.x=p.x;pend.y=p.y;}else cv4.style.cursor=objAt(p)?'crosshair':'default';});
+cv4.addEventListener('pointerup',e=>{if(!pend)return;const p=stage4.world(e),to=objAt(p),from=pend.from;pend=null;
+  if(!to||to===from){$('#hint4').textContent='Ziehe bis zu einem anderen Gegenstand, damit ein Lichtstrahl entsteht.';return;}
+  if(!lines[tk].some(l=>l[0]===from&&l[1]===to))lines[tk].push([from,to]);colors=null;$('#t4fb').innerHTML='';
+  $('#hint4').textContent=`Lichtstrahl von ${NAMES[from]} zu ${NAMES[to]} gezeichnet.`;});
+cv4.addEventListener('pointercancel',()=>{pend=null;});
+$('#t4undo').addEventListener('click',()=>{lines[tk].pop();colors=null;$('#t4fb').innerHTML='';});
+$('#t4clear').addEventListener('click',()=>{lines[tk]=[];colors=null;$('#t4fb').innerHTML='';});
+$('#t4check').addEventListener('click',()=>{
+  const T=TASKS[tk],L=lines[tk],msgs=[];colors=[];let errors=0;
+  const lit=new Set(Object.keys(T.objs).filter(k=>T.objs[k].src));
+  L.forEach(l=>{if(T.objs[l[0]].src)lit.add(l[1]);});
+  L.forEach((l,i)=>{const [a,b]=l,A=NAMES[a],B=NAMES[b];
+    const need=T.need.some(n=>n[0]===a&&n[1]===b);
+    if(a==='eye'){errors++;colors[i]='#ff9a85';msgs.push(['bad',`<b>${A} → ${B}:</b> Vom Auge geht kein Licht aus. Das Licht muss ins Auge hinein laufen.`]);}
+    else if(T.earth&&segCircle(T.objs[a],T.objs[b],T.earth,T.earth.r-.6)){errors++;colors[i]='#ff9a85';msgs.push(['bad',`<b>${A} → ${B}:</b> Dieser Weg ist versperrt. Es ist Nacht, die Erde steht dazwischen.`]);}
+    else if(!lit.has(a)){errors++;colors[i]='#ff9a85';msgs.push(['bad',`<b>${A} → ${B}:</b> ${A==='Mond'?'Der Mond':'Der '+A} leuchtet nicht selbst. Zeichne zuerst, wie Licht dorthin kommt.`]);}
+    else if(T.objs[b].src){errors++;colors[i]='#ff9a85';msgs.push(['bad',`<b>${A} → ${B}:</b> Der Pfeil zeigt zur Lichtquelle. Licht geht von der Lichtquelle aus.`]);}
+    else if(need){colors[i]='#86d9a0';}
+    else{colors[i]='#f2c25c';msgs.push(['',`<b>${A} → ${B}:</b> Das stimmt zwar, ist für diese Aufgabe aber nicht nötig.`]);}
+  });
+  const missing=T.need.filter(n=>!L.some(l=>l[0]===n[0]&&l[1]===n[1]));
+  missing.forEach(n=>msgs.push(['bad',`Es fehlt noch ein Lichtstrahl: Wie kommt das Licht ${n[1]==='eye'?'ins Auge':'zu'+(n[1]==='moon'?'m Mond':'m '+NAMES[n[1]])}?`]));
+  const ok=!missing.length&&!errors;
+  if(ok){msgs.unshift(['good','Richtig gezeichnet. '+(tk===0?'Die Lampe ist der Sender, das Auge der Empfänger.':tk===1?'Der Ball wird beleuchtet und wirft Licht ins Auge.':'Der Mond leuchtet nicht selbst. Wir sehen ihn, weil er Sonnenlicht zurückwirft.')]);
+    solved[tk]=1;$$('#tasks4 button')[tk].classList.add('solved');if(solved.every(Boolean))markDone(3);}
+  if(!L.length)msgs.push(['bad','Du hast noch keinen Lichtstrahl gezeichnet.']);
+  $('#t4fb').innerHTML=msgs.map(m=>`<p class="${m[0]}"${m[0]===''?' style="border-left-color:var(--amber)"':''}>${m[1]}</p>`).join('');
+});
+
+/* ---------- Schritt 5: Merksätze ---------- */
+const BANK=['Lichtquellen','natürliche','künstliche','beleuchtet','zurück','Auge','Sender','Empfänger','Lichtstrahl','gerade','Pfeil','Modell'];
+const MERK=[
+  'Körper, die selbst Licht aussenden, heißen {Lichtquellen}. Man unterscheidet {natürliche} und {künstliche} Lichtquellen.',
+  'Körper, die nicht selbst leuchten, sehen wir nur, wenn sie {beleuchtet} werden. Sie werfen einen Teil des Lichts {zurück}.',
+  'Wir sehen einen Gegenstand, wenn Licht von ihm in unser {Auge} gelangt. Die Lichtquelle ist der {Sender}, das Auge ist der {Empfänger}.',
+  'Den Weg des Lichts zeichnen wir als {Lichtstrahl}: eine {gerade} Linie mit einem {Pfeil}, der die Richtung angibt. Der Lichtstrahl ist ein {Modell}, das es in Wirklichkeit nicht gibt.',
+];
+function buildMerk(){
+  const opts=[...BANK].sort((a,b)=>a.localeCompare(b,'de'));let n=0;
+  $('#merk').innerHTML=MERK.map((m,i)=>`<p><b class="n">${i+1}</b>`+m.replace(/\{(.+?)\}/g,(_,w)=>`<select id="gap${n++}" data-a="${w}" aria-label="Lücke"><option value="">…</option>${opts.map(o=>`<option>${o}</option>`).join('')}</select>`)+'</p>').join('');
+  $$('#merk select').forEach(s=>s.addEventListener('change',()=>{s.classList.remove('ok','bad');$('#merkScore').textContent='';}));
+  $('#merkScore').textContent='';
+}
+$('#merkCheck').addEventListener('click',()=>{const g=$$('#merk select');let r=0;
+  const pair=[g[1].value,g[2].value].sort().join();const pairOk=pair===['künstliche','natürliche'].join();
+  g.forEach((s,i)=>{s.classList.remove('ok','bad');if(!s.value)return;
+    const good=(i===1||i===2)?pairOk:s.value===s.dataset.a;if(good)r++;s.classList.add(good?'ok':'bad');});
+  $('#merkScore').textContent=`${r} von ${g.length} Lücken richtig`;if(r===g.length)markDone(4);});
+$('#merkReset').addEventListener('click',buildMerk);
+buildMerk();
+
+/* ---------- Start ---------- */
+function loop(t){if(cur===1)draw2(t);else if(cur===3)draw4(t);requestAnimationFrame(loop);}
+let start=0;try{const s=+localStorage.getItem('ll-sehen-step');if(s>=0&&s<5)start=s;}catch(e){}
+const m=location.hash.match(/^#schritt([1-5])$/);if(m)start=+m[1]-1;
+go(start);requestAnimationFrame(loop);
+})();
+</script>
+
+</body></html>
